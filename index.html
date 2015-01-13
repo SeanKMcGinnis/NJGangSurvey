@@ -252,15 +252,93 @@
     <script type="text/javascript">
       google.load('visualization', '1', {packages: ['imagepiechart']});
     </script>
-  <script type="text/javascript" src="lib/js/pageComponents.js"></script>  <script type="text/javascript" src="lib/js/gangID.js"></script>  <script type="text/javascript" src="lib/js/reportCard.js"></script>  <script type="text/javascript" src="lib/js/gangReport.js"></script>  <script type="text/javascript">            dojo.require("dijit.dijit");      dojo.require("dijit.Dialog");      dojo.require("dijit.form.Button");      dojo.require("dijit.form.CheckBox");      dojo.require("dijit.layout.BorderContainer");      dojo.require("dijit.layout.ContentPane");      dojo.require("dijit.layout.TabContainer");
-      dojo.require("dojox.charting.Chart2D");      dojo.require("esri.map");      dojo.require("esri.layers.FeatureLayer");
-      dojo.require("esri.layers.graphics");      dojo.require("esri.tasks.query");      dojo.require("dojo.number");      var map;
-      var dialog;      var gangLayer;
-      var gLayer;      var townCode;	  var gangDetails = false;      function init() {       var levelOfDetail = [		  {"level" : 0, "resolution" : 3472.22222222222, "scale" : 4000000},		  {"level" : 1, "resolution" : 2604.16666666667, "scale" : 3000000},		  {"level" : 2, "resolution" : 2170.13888888889, "scale" : 2500000},		  {"level" : 3, "resolution" : 1562.5, "scale" : 1800000},		  {"level" : 4, "resolution" : 976.5625, "scale" : 1125000},		  {"level" : 5, "resolution" : 494.791666666667, "scale" : 570000},		  {"level" : 6, "resolution" : 260.416666666667, "scale" : 300000},		  {"level" : 7, "resolution" : 130.208333333333, "scale" : 150000},		  {"level" : 8, "resolution" : 65.1041666666667, "scale" : 75000},		  {"level" : 9, "resolution" : 32.5520833333333, "scale" : 37500},		  {"level" : 10, "resolution" : 21.7013888888889, "scale" : 25000},		  {"level" : 11, "resolution" : 10.8506944444444, "scale" : 12500},        		  {"level" : 12, "resolution" : 5.20833333333333, "scale" : 6000},		  {"level" : 13, "resolution" : 2.08333333333333, "scale" : 2400},		  {"level" : 14, "resolution" : 1.04166666666667, "scale" : 1200},		];		var initialExtent = new esri.geometry.Extent({		  "xmin": 170000,		  "ymin": 10000,		  "xmax":  707125,		  "ymax": 975000,		  "spatialReference": {		      "wkid": 3424		  }		});        //create map        map = new esri.Map("mapDiv",{extent:initialExtent,lods:levelOfDetail});        //create and add new layer        var layer = new esri.layers.ArcGISTiledMapServiceLayer("http://njgin.state.nj.us/ArcGIS/rest/services/Basemap/bottom/MapServer");        map.addLayer(layer);        gangLayer = new esri.layers.FeatureLayer("http://services2.arcgis.com/XVOqAjTOJ5P6ngMu/arcgis/rest/services/New_Jersey_Gang_Survey_-_2010/FeatureServer/0", {          mode: esri.layers.FeatureLayer.MODE_ONDEMAND,          outFields: ["*"]        });
-        //gangLayer.setAutoGeneralize(true);        var defaultSymbol = new esri.symbol.SimpleFillSymbol().setStyle(esri.symbol.SimpleFillSymbol.STYLE_NULL, new dojo.Color([80,80,80]), .5);        defaultSymbol.outline.setStyle(esri.symbol.SimpleLineSymbol.STYLE_NULL);        var renderer = new esri.renderer.UniqueValueRenderer(defaultSymbol, "GANGPRES");        renderer.addValue("Yes", new esri.symbol.SimpleFillSymbol().setColor(new dojo.Color([255, 132, 99, 0.5])));        renderer.addValue("No", new esri.symbol.SimpleFillSymbol().setColor(new dojo.Color([145, 176, 147, 0.5])));        renderer.addValue("Don't Know", new esri.symbol.SimpleFillSymbol().setColor(new dojo.Color([202, 204, 153, 0.5])));        gangLayer.setRenderer(renderer);        map.addLayer(gangLayer);
+  <script type="text/javascript" src="lib/js/pageComponents.js"></script>
+  <script type="text/javascript" src="lib/js/gangID.js"></script>
+  <script type="text/javascript" src="lib/js/reportCard.js"></script>
+  <script type="text/javascript" src="lib/js/gangReport.js"></script>
+  <script type="text/javascript">
+    dojo.require("dijit.dijit");
+    dojo.require("dijit.Dialog");dojo.require("dijit.form.Button");
+    dojo.require("dijit.form.CheckBox");
+    dojo.require("dijit.layout.BorderContainer");
+    dojo.require("dijit.layout.ContentPane");
+    dojo.require("dijit.layout.TabContainer");
+    dojo.require("dojox.charting.Chart2D");
+    dojo.require("esri.map");
+    dojo.require("esri.layers.FeatureLayer");
+    dojo.require("esri.layers.graphics");
+    dojo.require("esri.tasks.query");
+    dojo.require("dojo.number");
+    var map;
+    var dialog;
+    var gangLayer;
+    var gLayer;
+    var townCode;
+    var gangDetails = false;
+    function init() {
+        var levelOfDetail = [
+            {"level" : 0, "resolution" : 3472.22222222222, "scale" : 4000000},
+            {"level" : 1, "resolution" : 2604.16666666667, "scale" : 3000000},
+            {"level" : 2, "resolution" : 2170.13888888889, "scale" : 2500000},
+            {"level" : 3, "resolution" : 1562.5, "scale" : 1800000},
+            {"level" : 4, "resolution" : 976.5625, "scale" : 1125000},
+            {"level" : 5, "resolution" : 494.791666666667, "scale" : 570000},
+            {"level" : 6, "resolution" : 260.416666666667, "scale" : 300000},
+            {"level" : 7, "resolution" : 130.208333333333, "scale" : 150000},
+            {"level" : 8, "resolution" : 65.1041666666667, "scale" : 75000},
+            {"level" : 9, "resolution" : 32.5520833333333, "scale" : 37500},
+            {"level" : 10, "resolution" : 21.7013888888889, "scale" : 25000},
+            {"level" : 11, "resolution" : 10.8506944444444, "scale" : 12500},
+            {"level" : 12, "resolution" : 5.20833333333333, "scale" : 6000},
+            {"level" : 13, "resolution" : 2.08333333333333, "scale" : 2400},
+            {"level" : 14, "resolution" : 1.04166666666667, "scale" : 1200},
+          ];
+        var initialExtent = new esri.geometry.Extent({
+            "xmin": 170000,
+            "ymin": 10000,
+            "xmax":  707125,
+            "ymax": 975000,
+            "spatialReference": {"wkid": 3424}
+            }); 
+        //create map
+        map = new esri.Map("mapDiv",{extent:initialExtent,lods:levelOfDetail});
+        //create and add new layer
+        var layer = new esri.layers.ArcGISTiledMapServiceLayer("http://njgin.state.nj.us/ArcGIS/rest/services/Basemap/bottom/MapServer");
+        map.addLayer(layer);
+        gangLayer = new esri.layers.FeatureLayer("http://services1.arcgis.com/ZcxtvO7wNR3U7VWZ/arcgis/rest/services/2010_New_Jersey_Gang_Survey/FeatureServer/0",{
+            mode: esri.layers.FeatureLayer.MODE_ONDEMAND,
+            outFields: ["*"]
+          });
+        var defaultSymbol = new esri.symbol.SimpleFillSymbol().setStyle(esri.symbol.SimpleFillSymbol.STYLE_NULL, new dojo.Color([80,80,80]), .5);
+        defaultSymbol.outline.setStyle(esri.symbol.SimpleLineSymbol.STYLE_NULL);
+        var renderer = new esri.renderer.UniqueValueRenderer(defaultSymbol, "GANGPRES");
+        renderer.addValue("Yes", new esri.symbol.SimpleFillSymbol().setColor(new dojo.Color([255, 132, 99, 0.5])));
+        renderer.addValue("No", new esri.symbol.SimpleFillSymbol().setColor(new dojo.Color([145, 176, 147, 0.5])));
+        renderer.addValue("Don't Know", new esri.symbol.SimpleFillSymbol().setColor(new dojo.Color([202, 204, 153, 0.5])));
+        gangLayer.setRenderer(renderer);
+        map.addLayer(gangLayer);
         gLayer = new esri.layers.GraphicsLayer();
-        map.addLayer(gLayer);        var resizeTimer;		dojo.connect(map, 'onLoad', function(theMap) {		  dojo.connect(dijit.byId("mapDiv"), 'resize', function() {  //resize the map if the div is resized		    clearTimeout(resizeTimer);		    resizeTimer = setTimeout( function() {		      map.resize();		      map.reposition();		    }, 500);		  });
-		  		});		dojo.connect(gangLayer, "onSelectionComplete", getGangInfo);		dojo.connect(map, 'onClick', findGangs);		var gangDialog = dijit.byId("dialogGang");		dojo.connect(gangDialog, "onHide", clearTab);
-		esriConfig.defaults.map.logoLink = "http://obeythekitty.blogspot.com";      }      function clearTab(){      	dijit.byId("tabGangs").destroyDescendants();      }      dojo.addOnLoad(init);
+        map.addLayer(gLayer);
+        var resizeTimer;
+        dojo.connect(map, 'onLoad', function(theMap) {
+            dojo.connect(dijit.byId("mapDiv"), 'resize', function() {
+                //resize the map if the div is resized
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout( function() {
+                    map.resize();
+                    map.reposition();
+                    }, 500);
+                });
+		  	});
+		dojo.connect(gangLayer, "onSelectionComplete", getGangInfo);
+		dojo.connect(map, 'onClick', findGangs);
+        var gangDialog = dijit.byId("dialogGang");
+        dojo.connect(gangDialog, "onHide", clearTab);
+		esriConfig.defaults.map.logoLink = "http://obeythekitty.blogspot.com";
+		}
+		function clearTab(){
+		    dijit.byId("tabGangs").destroyDescendants();
+		}
+		dojo.addOnLoad(init);
     </script>
 </html>
